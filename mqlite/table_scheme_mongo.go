@@ -3,7 +3,8 @@ package mqlite
 import (
 	"errors"
 	"fmt"
-	"mqlite/nosql/mmongo"
+
+	"github.com/jiftle/mqlite/nosql/mmongo"
 
 	"github.com/gogf/gf/v2/os/gtime"
 	"go.mongodb.org/mongo-driver/mongo"

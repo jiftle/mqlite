@@ -1,9 +1,10 @@
-package github.com/jiftle/mqlite
+package mqlite
 
 import (
 	"fmt"
-	"mqlite/nosql/mgolevel"
 	"strings"
+
+	"github.com/jiftle/mqlite/nosql/mgolevel"
 
 	"github.com/gogf/gf/v2/os/gtime"
 )

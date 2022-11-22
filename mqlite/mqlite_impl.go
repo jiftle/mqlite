@@ -1,13 +1,14 @@
-package github.com/jiftle/mqlite
+package mqlite
 
 import (
 	"context"
 	"fmt"
-	"mqlite/nosql"
-	"mqlite/nosql/mgolevel"
-	"mqlite/nosql/mmongo"
 	"strings"
 	"time"
+
+	"github.com/jiftle/mqlite/nosql"
+	"github.com/jiftle/mqlite/nosql/mgolevel"
+	"github.com/jiftle/mqlite/nosql/mmongo"
 
 	"github.com/gogf/gf/v2/frame/g"
 )
