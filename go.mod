@@ -1,4 +1,4 @@
-module mqlite
+module github.com/jiftle/mqlite
 
 go 1.19
 

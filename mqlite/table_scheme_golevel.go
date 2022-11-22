@@ -1,4 +1,4 @@
-package mqlite
+package github.com/jiftle/mqlite
 
 import (
 	"fmt"
