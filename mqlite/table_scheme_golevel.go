@@ -11,7 +11,7 @@ import (
 
 func (s *MetaTableSchemeDao) GoLevel_tableIsExisted(tableName string, client *mgolevel.GoLevelDriver) (b bool) {
 	key := s.GoLevelMeta_GetTableKey(tableName)
-	err := client.FindOne(s.DbName, key, nil)
+	err := client.FindOne(key, nil)
 	if err != nil {
 		if strings.Contains(err.Error(), "leveldb: not found") {
 			b = false
@@ -33,7 +33,7 @@ func (s *MetaTableSchemeDao) GoLevelMeta_CreateTableSpace(tableName string, clie
 	v.DeleteTime = createtime
 
 	key := s.GoLevelMeta_GetTableKey(v.TableName)
-	err := client.Insert(s.DbName, key, v)
+	err := client.Insert(key, v)
 	fmt.Println("create table space", tableName, err)
 }
 
@@ -48,7 +48,7 @@ func (s *MetaTableSchemeDao) GoLevelGetTableNewAutoID(tableName string, client *
 
 	key := s.GoLevelMeta_GetTableKey(tableName)
 	outv := &MetaTableScheme{}
-	err := client.FindOne(s.DbName, key, outv)
+	err := client.FindOne(key, outv)
 	fmt.Println(err, outv)
 	if err != nil {
 		id = 1
@@ -61,13 +61,13 @@ func (s *MetaTableSchemeDao) GoLevelGetTableNewAutoID(tableName string, client *
 func (s *MetaTableSchemeDao) GoLevelUpdateAutoId(table string, client *mgolevel.GoLevelDriver) {
 	key := s.GoLevelMeta_GetTableKey(table)
 	outv := &MetaTableScheme{}
-	err := client.FindOne(s.DbName, key, outv)
+	err := client.FindOne(key, outv)
 	if err != nil {
 		return
 	}
 	outv.UpdateTime = gtime.Now().Layout("2006-01-02 15:03:04.000")
 	outv.AutoIncrSeq = outv.AutoIncrSeq + 1
-	client.UpdateOne(s.DbName, key, outv)
+	client.UpdateOne(key, outv)
 }
 
 func (s *MetaTableSchemeDao) GoLevelMeta_GetTableKey(tableName string) (key string) {

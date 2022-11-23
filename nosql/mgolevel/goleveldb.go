@@ -71,13 +71,13 @@ func (s *GoLevelDriver) Connect() (err error) {
 }
 
 // 数据库，集合
-func (s *GoLevelDriver) Insert(collection string, key string, doc interface{}) (err error) {
+func (s *GoLevelDriver) Insert(key string, doc interface{}) (err error) {
 	var k string
 	var bk, bv []byte
 	var val []byte
 
 	// key
-	k = fmt.Sprintf("%s-%s", collection, key)
+	k = key
 	g.Log().Infof(context.TODO(), "[leveldb] insert, %v", k)
 
 	val, err = bson.Marshal(doc)
@@ -103,8 +103,8 @@ func (s *GoLevelDriver) Insert(collection string, key string, doc interface{}) (
 	return nil
 }
 
-func (s *GoLevelDriver) FindOne(collection string, key string, out interface{}) error {
-	k := fmt.Sprintf("%s-%s", collection, key)
+func (s *GoLevelDriver) FindOne(key string, out interface{}) error {
+	k := key
 	g.Log().Infof(context.TODO(), "[leveldb] find, %v", k)
 	byt, err := s.LevelDB.Get([]byte(k), nil)
 	if err != nil {
@@ -118,13 +118,11 @@ func (s *GoLevelDriver) FindOne(collection string, key string, out interface{}) 
 	return nil
 }
 
-func (s *GoLevelDriver) UpdateOne(collection string, key string, doc interface{}) error {
-	var k string
+func (s *GoLevelDriver) UpdateOne(key string, doc interface{}) error {
 	var bk, bv []byte
 	var val []byte
 
-	// key
-	k = fmt.Sprintf("%s-%s", collection, key)
+	k := key
 	g.Log().Infof(context.TODO(), "[leveldb] update, %v", k)
 
 	val, err := bson.Marshal(doc)
@@ -150,8 +148,8 @@ func (s *GoLevelDriver) UpdateOne(collection string, key string, doc interface{}
 	return nil
 }
 
-func (s *GoLevelDriver) FindAll(collection string, pre string, out interface{}) (err error) {
-	k := collection + "-" + pre
+func (s *GoLevelDriver) FindAll(pre string, out interface{}) (err error) {
+	k := pre
 	g.Log().Infof(context.TODO(), "[leveldb] findAll, %v", k)
 	m := make(map[string][]byte)
 	iter := s.LevelDB.NewIterator(util.BytesPrefix([]byte(k)), nil)
@@ -166,7 +164,7 @@ func (s *GoLevelDriver) FindAll(collection string, pre string, out interface{}) 
 	if err != nil {
 		return
 	}
-	//g.Log().Infof("[leveldb] findAll, out: %v", m)
+	//g.Log().Infof(context.TODO(), "[leveldb] findAll, out: %v", m)
 
 	result := out
 	resultv := reflect.ValueOf(result)
@@ -248,8 +246,8 @@ func (s *GoLevelDriver) FindAllSort(ctx context.Context, collection string, pre 
 	return nil
 }
 
-func (s *GoLevelDriver) DeleteOne(collection string, key string) error {
-	k := fmt.Sprintf("%s-%s", collection, key)
+func (s *GoLevelDriver) DeleteOne(key string) error {
+	k := key
 	g.Log().Infof(context.TODO(), "[leveldb] delete, %v", k)
 	err := s.LevelDB.Delete([]byte(k), nil)
 	if err != nil {
@@ -259,8 +257,8 @@ func (s *GoLevelDriver) DeleteOne(collection string, key string) error {
 	return nil
 }
 
-func (s *GoLevelDriver) DeleteAll(ctx context.Context, collection string, pre string) error {
-	k := collection + "-" + pre
+func (s *GoLevelDriver) DeleteAll(ctx context.Context, pre string) error {
+	k := pre
 	g.Log().Infof(ctx, "[leveldb] deleteAll, %v", k)
 	m := make(map[string][]byte)
 	iter := s.LevelDB.NewIterator(util.BytesPrefix([]byte(k)), nil)
@@ -290,8 +288,8 @@ func (s *GoLevelDriver) DeleteAll(ctx context.Context, collection string, pre st
 
 	return nil
 }
-func (s *GoLevelDriver) Count(collection string, prefix string) (count int64, err error) {
-	k := collection + "-" + prefix
+func (s *GoLevelDriver) Count(prefix string) (count int64, err error) {
+	k := prefix
 	g.Log().Infof(context.TODO(), "[leveldb] Count, %v", k)
 	m := make(map[string][]byte)
 	iter := s.LevelDB.NewIterator(util.BytesPrefix([]byte(k)), nil)

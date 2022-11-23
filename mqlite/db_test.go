@@ -12,12 +12,12 @@ import (
 func TestConnectDB(t *testing.T) {
 	ctx := context.TODO()
 	// uri := "leveldb://@file(resource/store/db)"
-	uri := "mongodb://admin:zzyq2211@192.168.2.199:27017/?authSource=admin&readPreference=primary&appname=MongoDB%20Compass&ssl=false"
+	uri := "mongodb://admin:zzyq2211@192.168.112.27:27017/?authSource=admin&readPreference=primary&appname=MongoDB%20Compass&ssl=false"
 
 	// link : "mongodb://admin:zzyq2211@192.168.2.199:27017/?authSource=admin&readPreference=primary&appname=MongoDB%20Compass&ssl=false"
 	// link : "leveldb://@file(resource/store/db)"
 
-	DB = NewClient(uri)
+	DB = NewClient(uri, "alameng")
 
 	err := DB.Connect(5 * time.Second)
 	if err != nil {

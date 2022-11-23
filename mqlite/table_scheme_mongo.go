@@ -12,7 +12,7 @@ import (
 
 func (s *MetaTableSchemeDao) Mongo_tableIsExisted(tableName string, client *mmongo.MongoNewDriver) (b bool) {
 	key := s.MongoMeta_GetTableKey(tableName)
-	err := client.FindOne(s.DbName, key, nil)
+	err := client.FindOne(key, nil)
 	fmt.Println("find", err)
 	if err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
@@ -35,7 +35,7 @@ func (s *MetaTableSchemeDao) MongoMeta_CreateTableSpace(tableName string, client
 	v.DeleteTime = createtime
 
 	key := s.MongoMeta_GetTableKey(v.TableName)
-	err := client.Insert(s.DbName, key, v)
+	err := client.Insert(key, v)
 	fmt.Println("create table space", tableName, err)
 }
 
@@ -50,7 +50,7 @@ func (s *MetaTableSchemeDao) MongoGetTableNewAutoID(tableName string, client *mm
 
 	key := s.MongoMeta_GetTableKey(tableName)
 	outv := &MetaTableScheme{}
-	err := client.FindOne(s.DbName, key, outv)
+	err := client.FindOne(key, outv)
 	fmt.Println(err, outv)
 	if err != nil {
 		id = 1
@@ -63,13 +63,13 @@ func (s *MetaTableSchemeDao) MongoGetTableNewAutoID(tableName string, client *mm
 func (s *MetaTableSchemeDao) MongoUpdateAutoId(table string, client *mmongo.MongoNewDriver) {
 	key := s.MongoMeta_GetTableKey(table)
 	outv := &MetaTableScheme{}
-	err := client.FindOne(s.DbName, key, outv)
+	err := client.FindOne(key, outv)
 	if err != nil {
 		return
 	}
 	outv.UpdateTime = gtime.Now().Layout("2006-01-02 15:03:04.000")
 	outv.AutoIncrSeq = outv.AutoIncrSeq + 1
-	client.UpdateOne(s.DbName, key, outv)
+	client.UpdateOne(key, outv)
 }
 
 func (s *MetaTableSchemeDao) MongoMeta_GetTableKey(tableName string) (key string) {

@@ -7,7 +7,7 @@ import (
 
 func TestConnect(t *testing.T) {
 	uri := "mongodb://admin:zzyq2211@192.168.112.27:27017/?authSource=admin&readPreference=primary&appname=MongoDB%20Compass&ssl=false"
-	mgo := NewClient(uri, "bb")
+	mgo := NewClient(uri, "bb", "col")
 	err := mgo.Connect()
 	if err != nil {
 		t.Fatal(err)
@@ -22,7 +22,7 @@ func TestConnect(t *testing.T) {
 		PublicKey:  "1122",
 		PrivateKey: "999999999999",
 	}
-	err = mgo.Insert("collect", "st", sst)
+	err = mgo.Insert("st", sst)
 	if err != nil {
 		t.Fatal(err)
 	}

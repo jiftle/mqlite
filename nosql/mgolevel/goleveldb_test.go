@@ -1,6 +1,7 @@
 package mgolevel
 
 import (
+	"fmt"
 	_ "fmt"
 	"testing"
 )
@@ -22,10 +23,17 @@ func TestConnect(t *testing.T) {
 		PublicKey:  "1122",
 		PrivateKey: "999999999999",
 	}
-	err = mgo.Insert("collect", "st", sst)
+	err = mgo.Insert("st122", sst)
 	if err != nil {
 		t.Fatal(err)
 	}
+
+	count, err := mgo.Count("st")
+	fmt.Println(err, count)
+
+	arOut := make([]St, 0)
+	err = mgo.FindAll("s", &arOut)
+	fmt.Println(err, arOut)
 
 	// nst := St{}
 	// err = MongoNew.FindOne(ctx, "sysparam", "10001", &nst)

@@ -17,13 +17,14 @@ import (
 )
 
 type MongoNewDriver struct {
-	client    *mongo.Client
-	Host      string
-	Timeout   time.Duration
-	PoolLimit int
-	DbName    string // 数据库名称
-	URI       string
-	Connected bool // 连接状态
+	client      *mongo.Client
+	Host        string
+	Timeout     time.Duration
+	PoolLimit   int
+	DbName      string // 数据库名称
+	CollectName string
+	URI         string
+	Connected   bool // 连接状态
 }
 
 type kv struct {
@@ -31,10 +32,11 @@ type kv struct {
 	Val interface{}
 }
 
-func NewClient(uri string, dbname string) *MongoNewDriver {
+func NewClient(uri string, dbname string, collectName string) *MongoNewDriver {
 	return &MongoNewDriver{
-		URI:    uri,
-		DbName: dbname,
+		URI:         uri,
+		DbName:      dbname,
+		CollectName: collectName,
 	}
 }
 
@@ -63,9 +65,9 @@ func (s *MongoNewDriver) Connect() (err error) {
 	return
 }
 
-func (s *MongoNewDriver) Count(collection string, key string) (count int64, err error) {
+func (s *MongoNewDriver) Count(key string) (count int64, err error) {
 	client := s.client
-	coll := client.Database(s.DbName).Collection(collection)
+	coll := client.Database(s.DbName).Collection(s.CollectName)
 	filter := bson.D{}
 	filter = append(filter, bson.E{
 		Key:   "key",
@@ -81,9 +83,9 @@ func (s *MongoNewDriver) Count(collection string, key string) (count int64, err 
 	return
 }
 
-func (s *MongoNewDriver) Insert(collection string, key string, doc interface{}) (err error) {
+func (s *MongoNewDriver) Insert(key string, doc interface{}) (err error) {
 	client := s.client
-	collect := client.Database(s.DbName).Collection(collection)
+	collect := client.Database(s.DbName).Collection(s.CollectName)
 	tmpKV := kv{
 		Key: key,
 		Val: doc,
@@ -95,9 +97,9 @@ func (s *MongoNewDriver) Insert(collection string, key string, doc interface{}) 
 	return
 }
 
-func (s *MongoNewDriver) FindOne(collection string, key string, out interface{}) (err error) {
+func (s *MongoNewDriver) FindOne(key string, out interface{}) (err error) {
 	client := s.client
-	collect := client.Database(s.DbName).Collection(collection)
+	collect := client.Database(s.DbName).Collection(s.CollectName)
 	outv := &kv{}
 	filter := bson.M{
 		"key": key,
@@ -122,9 +124,9 @@ func (s *MongoNewDriver) FindOne(collection string, key string, out interface{})
 	return
 }
 
-func (s *MongoNewDriver) DeleteOne(collection string, key string) error {
+func (s *MongoNewDriver) DeleteOne(key string) error {
 	client := s.client
-	coll := client.Database(s.DbName).Collection(collection)
+	coll := client.Database(s.DbName).Collection(s.CollectName)
 	opts := options.Delete().SetCollation(&options.Collation{
 		Locale:    "en_US",
 		Strength:  1,
@@ -138,25 +140,25 @@ func (s *MongoNewDriver) DeleteOne(collection string, key string) error {
 	return nil
 }
 
-func (s *MongoNewDriver) UpdateOne(collection string, key string, doc interface{}) (err error) {
-	err = s.FindOne(collection, key, nil)
+func (s *MongoNewDriver) UpdateOne(key string, doc interface{}) (err error) {
+	err = s.FindOne(key, nil)
 	if err != nil {
 		return
 	}
-	err = s.DeleteOne(collection, key)
+	err = s.DeleteOne(key)
 	if err != nil {
 		return
 	}
-	err = s.Insert(collection, key, doc)
+	err = s.Insert(key, doc)
 	if err != nil {
 		return
 	}
 	return
 }
 
-func (s *MongoNewDriver) FindAll(collection string, prefix string, out interface{}) (err error) {
+func (s *MongoNewDriver) FindAll(prefix string, out interface{}) (err error) {
 	client := s.client
-	coll := client.Database(s.DbName).Collection(collection)
+	coll := client.Database(s.DbName).Collection(s.CollectName)
 	filter := bson.D{}
 	filter = append(filter, bson.E{
 		Key:   "key",

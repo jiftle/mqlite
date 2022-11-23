@@ -36,7 +36,7 @@ func NewClient(uri string, dbname string) *MqliteImpl {
 			DbName:          dbname,
 			Uri:             uri,
 			_TableSchemeDao: NewTableSchemeDao(dbname),
-			NoSqlClient:     mmongo.NewClient(uri, CNT_DataBaseName),
+			NoSqlClient:     mmongo.NewClient(uri, CNT_DataBaseName, dbname),
 		}
 	} else {
 		return &MqliteImpl{
@@ -92,7 +92,7 @@ func (s *MqliteImpl) Insert(table string, doc interface{}) (id uint32, err error
 		nid := s._TableSchemeDao.MongoGetTableNewAutoID(table, client)
 		key := s._CreateKey(table, nid)
 		fmt.Println(key)
-		err = s.NoSqlClient.Insert(s.DbName, key, doc)
+		err = s.NoSqlClient.Insert(key, doc)
 		if err != nil {
 			return
 		}
@@ -108,7 +108,7 @@ func (s *MqliteImpl) Insert(table string, doc interface{}) (id uint32, err error
 		nid := s._TableSchemeDao.GoLevelGetTableNewAutoID(table, client)
 		key := s._CreateKey(table, nid)
 		fmt.Println(key)
-		err = s.NoSqlClient.Insert(s.DbName, key, doc)
+		err = s.NoSqlClient.Insert(key, doc)
 		if err != nil {
 			return
 		}
@@ -121,7 +121,7 @@ func (s *MqliteImpl) Insert(table string, doc interface{}) (id uint32, err error
 }
 func (s *MqliteImpl) FindOne(table string, id uint32, out interface{}) (err error) {
 	key := s._CreateKey(table, id)
-	err = s.NoSqlClient.FindOne(s.DbName, key, out)
+	err = s.NoSqlClient.FindOne(key, out)
 	if err != nil {
 		g.Log().Warningf(context.TODO(), "%v", err)
 	}
@@ -129,23 +129,23 @@ func (s *MqliteImpl) FindOne(table string, id uint32, out interface{}) (err erro
 }
 func (s *MqliteImpl) DeleteOne(table string, id uint32) (err error) {
 	key := s._CreateKey(table, id)
-	err = s.NoSqlClient.DeleteOne(s.DbName, key)
+	err = s.NoSqlClient.DeleteOne(key)
 	return
 }
 func (s *MqliteImpl) Count(table string) (count uint32, err error) {
 	key := s.GetKeyPrefix(table)
-	ncount, err := s.NoSqlClient.Count(s.DbName, key)
+	ncount, err := s.NoSqlClient.Count(key)
 	count = uint32(ncount)
 	return
 }
 func (s *MqliteImpl) UpdateOne(table string, id uint32, doc interface{}) (err error) {
 	key := s._CreateKey(table, id)
-	err = s.NoSqlClient.UpdateOne(s.DbName, key, doc)
+	err = s.NoSqlClient.UpdateOne(key, doc)
 	return
 }
 
 func (s *MqliteImpl) FindAll(table string, out interface{}) (err error) {
 	key := s.GetKeyPrefix(table)
-	err = s.NoSqlClient.FindAll(s.DbName, key, out)
+	err = s.NoSqlClient.FindAll(key, out)
 	return
 }
