@@ -6,8 +6,8 @@ import (
 )
 
 func TestConnect(t *testing.T) {
-	uri := "mongodb://admin:zzyq2211@192.168.2.199:27017/?authSource=admin&readPreference=primary&appname=MongoDB%20Compass&ssl=false"
-	mgo := NewClient(uri)
+	uri := "mongodb://admin:zzyq2211@192.168.112.27:27017/?authSource=admin&readPreference=primary&appname=MongoDB%20Compass&ssl=false"
+	mgo := NewClient(uri, "bb")
 	err := mgo.Connect()
 	if err != nil {
 		t.Fatal(err)

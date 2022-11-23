@@ -13,31 +13,37 @@ import (
 	"github.com/gogf/gf/v2/frame/g"
 )
 
+const (
+	CNT_DataBaseName = "mqlitedb"
+)
+
 type MqliteImpl struct {
 	StoreMode       int // 0 mongodb 1 golevel
 	NoSqlClient     nosql.NoSqlClient
 	ctx             context.Context
 	Uri             string
 	Name            string
+	DbName          string
 	_TableSchemeDao *MetaTableSchemeDao
 }
 
-func NewClient(uri string) *MqliteImpl {
+func NewClient(uri string, dbname string) *MqliteImpl {
 	mode := getStoreMode(uri)
 	if mode == 0 {
 		return &MqliteImpl{
 			StoreMode:       mode,
-			Name:            "mqlitedb",
+			Name:            CNT_DataBaseName,
+			DbName:          dbname,
 			Uri:             uri,
-			_TableSchemeDao: NewTableSchemeDao("mqlitedb"),
-			NoSqlClient:     mmongo.NewClient(uri),
+			_TableSchemeDao: NewTableSchemeDao(dbname),
+			NoSqlClient:     mmongo.NewClient(uri, CNT_DataBaseName),
 		}
 	} else {
 		return &MqliteImpl{
 			StoreMode:       mode,
-			Name:            "mqlitedb",
+			Name:            CNT_DataBaseName,
 			Uri:             uri,
-			_TableSchemeDao: NewTableSchemeDao("mqlitedb"),
+			_TableSchemeDao: NewTableSchemeDao(CNT_DataBaseName),
 			NoSqlClient:     mgolevel.NewClient(uri),
 		}
 	}
@@ -66,12 +72,12 @@ func (s *MqliteImpl) Connect(timeout time.Duration) (err error) {
 }
 
 func (s *MqliteImpl) GetKeyPrefix(tableName string) (key string) {
-	key = fmt.Sprintf("%v-%v-", s.Name, tableName)
+	key = fmt.Sprintf("%v-%v-", s.DbName, tableName)
 	return
 }
 
 func (s *MqliteImpl) _CreateKey(tableName string, id uint32) (key string) {
-	key = fmt.Sprintf("%v-%v-%04d", s.Name, tableName, id)
+	key = fmt.Sprintf("%v-%v-%04d", s.DbName, tableName, id)
 	return
 }
 
@@ -86,7 +92,7 @@ func (s *MqliteImpl) Insert(table string, doc interface{}) (id uint32, err error
 		nid := s._TableSchemeDao.MongoGetTableNewAutoID(table, client)
 		key := s._CreateKey(table, nid)
 		fmt.Println(key)
-		err = s.NoSqlClient.Insert(s.Name, key, doc)
+		err = s.NoSqlClient.Insert(s.DbName, key, doc)
 		if err != nil {
 			return
 		}
@@ -102,7 +108,7 @@ func (s *MqliteImpl) Insert(table string, doc interface{}) (id uint32, err error
 		nid := s._TableSchemeDao.GoLevelGetTableNewAutoID(table, client)
 		key := s._CreateKey(table, nid)
 		fmt.Println(key)
-		err = s.NoSqlClient.Insert(s.Name, key, doc)
+		err = s.NoSqlClient.Insert(s.DbName, key, doc)
 		if err != nil {
 			return
 		}
@@ -115,7 +121,7 @@ func (s *MqliteImpl) Insert(table string, doc interface{}) (id uint32, err error
 }
 func (s *MqliteImpl) FindOne(table string, id uint32, out interface{}) (err error) {
 	key := s._CreateKey(table, id)
-	err = s.NoSqlClient.FindOne(s.Name, key, out)
+	err = s.NoSqlClient.FindOne(s.DbName, key, out)
 	if err != nil {
 		g.Log().Warningf(context.TODO(), "%v", err)
 	}
@@ -123,23 +129,23 @@ func (s *MqliteImpl) FindOne(table string, id uint32, out interface{}) (err erro
 }
 func (s *MqliteImpl) DeleteOne(table string, id uint32) (err error) {
 	key := s._CreateKey(table, id)
-	err = s.NoSqlClient.DeleteOne(s.Name, key)
+	err = s.NoSqlClient.DeleteOne(s.DbName, key)
 	return
 }
 func (s *MqliteImpl) Count(table string) (count uint32, err error) {
 	key := s.GetKeyPrefix(table)
-	ncount, err := s.NoSqlClient.Count(s.Name, key)
+	ncount, err := s.NoSqlClient.Count(s.DbName, key)
 	count = uint32(ncount)
 	return
 }
 func (s *MqliteImpl) UpdateOne(table string, id uint32, doc interface{}) (err error) {
 	key := s._CreateKey(table, id)
-	err = s.NoSqlClient.UpdateOne(s.Name, key, doc)
+	err = s.NoSqlClient.UpdateOne(s.DbName, key, doc)
 	return
 }
 
 func (s *MqliteImpl) FindAll(table string, out interface{}) (err error) {
 	key := s.GetKeyPrefix(table)
-	err = s.NoSqlClient.FindAll(s.Name, key, out)
+	err = s.NoSqlClient.FindAll(s.DbName, key, out)
 	return
 }

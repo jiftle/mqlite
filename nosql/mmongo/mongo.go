@@ -31,10 +31,10 @@ type kv struct {
 	Val interface{}
 }
 
-func NewClient(uri string) *MongoNewDriver {
+func NewClient(uri string, dbname string) *MongoNewDriver {
 	return &MongoNewDriver{
 		URI:    uri,
-		DbName: "mqlitedb",
+		DbName: dbname,
 	}
 }
 
